@@ -45,11 +45,10 @@ func (t TransactionService) BorrowBook(memberID string, bookID int) error {
 		Due_date:    time.Now().AddDate(0, 0, 10).Format("02-01-2006"),
 	}
 
-	t.DB.BookTransactions = append(t.DB.BookTransactions, NewTransaction)
+	t.DB.BookTransactions = append(t.DB.BookTransactions, &NewTransaction)
 
 	return nil
 }
-
 
 // TO return the BOOk
 func (t TransactionService) ReturnBook(memberID string, bookID int) error {
@@ -66,10 +65,11 @@ func (t TransactionService) ReturnBook(memberID string, bookID int) error {
 	}
 
 	for _, transaction := range t.DB.BookTransactions {
-		if transaction.Return_date == "" && transaction.Member == member && transaction.Book == book {
+		if transaction.Return_date == "" && transaction.Member.Member_id == member.Member_id && transaction.Book.Book_id == book.Book_id {
 			transaction.Return_date = time.Now().Format("02-01-2006")
 			return nil
 		}
 	}
+
 	return nil
 }

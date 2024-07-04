@@ -11,7 +11,7 @@ package models
 type MockDB struct {
 	Members          []Member
 	Books            []Book
-	BookTransactions []Transaction
+	BookTransactions []*Transaction
 }
 
 //to get instance

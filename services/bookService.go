@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/askrishna98/library_/models"
 )
@@ -52,7 +53,7 @@ func (b BookService) GetBooksByAuthor(author string) []models.Book {
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
-		if book.Author == author {
+		if strings.EqualFold(book.Author, author) {
 			related_books = append(related_books, book)
 		}
 	}
@@ -66,7 +67,7 @@ func (b BookService) GetBooksByCategory(category string) []models.Book {
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
-		if book.Category == category {
+		if strings.EqualFold(book.Category, category) {
 			related_books = append(related_books, book)
 		}
 	}
@@ -81,7 +82,7 @@ func (b BookService) GetBooksByPrefix(prefix string) []models.Book {
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
-		if book.Title[:len(prefix)] == prefix {
+		if len(book.Title) >= len(prefix) && strings.EqualFold(book.Title[:len(prefix)], prefix) {
 			related_books = append(related_books, book)
 		}
 	}
