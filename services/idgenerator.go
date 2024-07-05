@@ -3,49 +3,50 @@ package service
 import "fmt"
 
 type IdGenerator struct {
-	Num           int
-	Alpha         string
-	BookID        int
-	TransactionID int
+	num           int
+	alpha         string
+	bookId        int
+	transactionId int
 }
 
 func InitalizeIDGenerator() *IdGenerator {
 	return &IdGenerator{
-		Num:           1,
-		Alpha:         "A",
-		BookID:        0,
-		TransactionID: 0,
+		num:           1,
+		alpha:         "A",
+		bookId:        0,
+		transactionId: 0,
 	}
 }
 
-// just to create bookID
-func (i *IdGenerator) GenerateBookID() int {
-	id := i.BookID
+// Generate bookId from 0 - ....(int value)
+func (i *IdGenerator) GenerateBookId() int {
+	id := i.bookId
 
-	i.BookID++
+	i.bookId++
 	return id
 }
 
-func (i *IdGenerator) GenerateTransactionID() int {
-	id := i.TransactionID
+// // Generate unique Id for every transaction from 0 - ....(int value)
+func (i *IdGenerator) GenerateTransactionId() int {
+	id := i.transactionId
 
-	i.BookID++
+	i.transactionId++
 	return id
 }
 
 func (i *IdGenerator) GenerateMemberID() string {
-	ID := i.Alpha + fmt.Sprintf("%03d", i.Num)
+	ID := i.alpha + fmt.Sprintf("%03d", i.num)
 	i.InitalizeNext()
 	return ID
 
 }
 
 func (i *IdGenerator) InitalizeNext() {
-	if i.Num == 999 {
-		i.Num = 1
-		i.Alpha = nextAlpha(i.Alpha)
+	if i.num == 999 {
+		i.num = 1
+		i.alpha = nextAlpha(i.alpha)
 	} else {
-		i.Num++
+		i.num++
 	}
 }
 

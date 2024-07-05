@@ -1,6 +1,10 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/askrishna98/library_/handlers"
+	"github.com/askrishna98/library_/loaddata"
 	"github.com/askrishna98/library_/models"
 	service "github.com/askrishna98/library_/services"
 )
@@ -8,28 +12,16 @@ import (
 func main() {
 	// should initiate DB first
 	DB := models.GetMockDBInstance()
-	newMember := models.Member{
-		Member_id: "101",
-		Name:      "ASWIN",
-		Email:     "asdasd@gmail.com",
-		Phone:     "3434134231",
+	Id := service.InitalizeIDGenerator()
+
+	loaddata.LoadData(DB, Id)
+
+	for _, val := range DB.Books {
+		fmt.Println(*val)
 	}
-
-	newBook := models.Book{
-		Title:    "test book",
-		Category: "horro",
-		Count:    2,
-		Author:   "ram",
+	for _, val := range DB.Members {
+		fmt.Println(*val)
 	}
-	memberServices := service.GetInstanceOfMemberService(DB)
-	bookServices := service.GetInstanceOfBookService(DB)
-	memberServices.CreateMember(newMember)
-	bookServices.CreateBook(newBook)
-
-	Trans := service.GetInstanceOfTransactionService(DB, memberServices, bookServices)
-	Trans.BorrowBook("101", 0)
-
-	// id := service.InitalizeGenerator()
-	// fmt.Println(id.Generate(), id.Generate())
+	handlers.StartApp()
 
 }

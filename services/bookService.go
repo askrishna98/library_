@@ -8,16 +8,19 @@ import (
 )
 
 type BookService struct {
-	DB *models.MockDB
+	DB          *models.MockDB
+	IdGenerator *IdGenerator
 }
 
-func GetInstanceOfBookService(DBInstance *models.MockDB) *BookService {
+func GetInstanceOfBookService(DBInstance *models.MockDB, IdGeneratorInstance *IdGenerator) *BookService {
 	return &BookService{
-		DB: DBInstance,
+		DB:          DBInstance,
+		IdGenerator: IdGeneratorInstance,
 	}
 }
 
-func (b BookService) CreateBook(newBook models.Book) error {
+func (b BookService) CreateBook(newBook *models.Book) error {
+	newBook.Book_id = b.IdGenerator.GenerateBookId()
 	b.DB.Books = append(b.DB.Books, newBook)
 	return nil
 }
@@ -33,11 +36,11 @@ func (b BookService) DeleteBook(bookID int) error {
 }
 
 // to know book is available or present  in library
-func (b BookService) BookAvailability(boodID int) (*models.Book, error) {
+func (b *BookService) BookAvailability(bookID int) (*models.Book, error) {
 	for _, book := range b.DB.Books {
-		if book.Book_id == boodID {
+		if book.Book_id == bookID {
 			if book.Count > 0 {
-				return &book, nil
+				return book, nil
 			} else {
 				return nil, errors.New("the book is currently unavailable")
 			}
@@ -47,14 +50,13 @@ func (b BookService) BookAvailability(boodID int) (*models.Book, error) {
 }
 
 // to get list of books by author name
-// needs to remove the case sensitivity
-func (b BookService) GetBooksByAuthor(author string) []models.Book {
+func (b *BookService) GetBooksByAuthor(author string) []models.Book {
 
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
 		if strings.EqualFold(book.Author, author) {
-			related_books = append(related_books, book)
+			related_books = append(related_books, *book)
 		}
 	}
 
@@ -62,13 +64,13 @@ func (b BookService) GetBooksByAuthor(author string) []models.Book {
 }
 
 // to get list of books by category
-func (b BookService) GetBooksByCategory(category string) []models.Book {
+func (b *BookService) GetBooksByCategory(category string) []models.Book {
 
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
 		if strings.EqualFold(book.Category, category) {
-			related_books = append(related_books, book)
+			related_books = append(related_books, *book)
 		}
 	}
 
@@ -77,13 +79,13 @@ func (b BookService) GetBooksByCategory(category string) []models.Book {
 
 // to get list of books by prefix
 
-func (b BookService) GetBooksByPrefix(prefix string) []models.Book {
+func (b *BookService) GetBooksByPrefix(prefix string) []models.Book {
 
 	related_books := []models.Book{}
 
 	for _, book := range b.DB.Books {
 		if len(book.Title) >= len(prefix) && strings.EqualFold(book.Title[:len(prefix)], prefix) {
-			related_books = append(related_books, book)
+			related_books = append(related_books, *book)
 		}
 	}
 	return related_books
