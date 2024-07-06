@@ -70,7 +70,7 @@ Book Transaction Services:
 
 # APIs
 
-### 1 API Endpoint: POST /api/members
+### 1. API Endpoint: POST /api/members
 
 #### Purpose
 
@@ -99,9 +99,121 @@ Create a new member in the system.
 }
 ```
 
-#### Notes
-
-- Endpoint: /api/members
-- Method: POST
-- Content-Type: application/json
 - responds with the newly created member details including a unique ID.
+
+### 2. API Endpoint: GET /api/members/:id
+
+#### Purpose
+
+Retrieve details of a specific member by their ID.
+
+#### Request
+
+- Endpoint: `/api/members/:id`
+- Method: GET
+
+#### Response Body (JSON)
+
+```json
+{
+  "Member_id": "A001",
+  "Name": "ASWIN KRISHNA P",
+  "Email": "aswin@example.com",
+  "Phone": "123-456-7890",
+  "Date": "2024-01-01"
+}
+```
+
+### 3. API Endpoint: POST /api/books
+
+#### Purpose
+
+Create a new book in the system.
+
+#### Request Body (JSON)
+
+```json
+{
+  "Title": "Book 2",
+  "Author": "Author1",
+  "Category": "Fiction",
+  "Count": 2
+}
+```
+
+#### Response Body (JSON)
+
+```json
+{
+  "id": 1,
+  "Title": "Book 2",
+  "Author": "Author1",
+  "Category": "Fiction",
+  "Count": 2
+}
+```
+
+- responds with the newly created book details including a unique ID (`id`).
+
+### 4. API Endpoint: GET /api/books?category=CATEGORY&author=AUTHORNAME&prefix=ANYPREFIX
+
+#### Purpose
+
+Retrieve a list of books based on optional filtering parameters.
+
+#### Request
+
+- Endpoint: `/api/books`
+- Method: GET
+- Query Parameters:
+  - `category`: Optional, Filters books by category.
+  - `author`: Optional, Filters books by author.
+  - `prefix`: Optional, Filters books by title prefix.
+
+#### Response Body (JSON)
+
+```json
+[
+  {
+    "Book_id": 0,
+    "Title": "To Kill a Mockingbird",
+    "Author": "Harper Lee",
+    "Category": "Fiction",
+    "Count": 5
+  }
+]
+```
+
+### 5. API Endpoint: POST /api/borrow
+
+#### Purpose
+
+TO borrow Book
+
+#### Request Body (JSON)
+
+```json
+{
+  "member_id": "A003",
+  "book_id": 6
+}
+```
+
+#### Response Body (JSON)
+
+### 6. API Endpoint: PATCH /api/return
+
+#### Purpose
+
+To return Book
+
+#### Request Body (JSON)
+
+```json
+{
+  "member_id": "A003",
+  "book_id": 6
+}
+```
+
+#### Response Body (JSON)
