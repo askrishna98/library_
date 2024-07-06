@@ -174,10 +174,24 @@ Retrieve a list of books based on optional filtering parameters.
 ```json
 [
   {
-    "Book_id": 0,
-    "Title": "To Kill a Mockingbird",
-    "Author": "Harper Lee",
-    "Category": "Fiction",
+    "Book_id": 8,
+    "Title": "The Hobbit",
+    "Author": "J.R.R. Tolkien",
+    "Category": "Fantasy",
+    "Count": 8
+  },
+  {
+    "Book_id": 20,
+    "Title": "The Lord of the Rings",
+    "Author": "J.R.R. Tolkien",
+    "Category": "Fantasy",
+    "Count": 7
+  },
+  {
+    "Book_id": 36,
+    "Title": "The Name of the Wind",
+    "Author": "Patrick Rothfuss",
+    "Category": "Fantasy",
     "Count": 5
   }
 ]
