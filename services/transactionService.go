@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"sync"
 	"time"
 
@@ -29,24 +30,24 @@ func GetInstanceOfTransactionService(DBInstance *models.MockDB,
 }
 
 // Creating a new Book transaction
-func (t *TransactionService) BorrowBook(memberID string, bookID int) error {
+func (t *TransactionService) BorrowBook(memberID string, bookID int) (*models.Transaction, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	book, err := t.BookServiceInstance.BookAvailability(bookID)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := t.BookServiceInstance.BookCount(book); err != nil {
-		return err
+		return nil, err
 	}
 
 	var NewTransaction = models.Transaction{
@@ -61,33 +62,45 @@ func (t *TransactionService) BorrowBook(memberID string, bookID int) error {
 
 	t.DB.BookTransactions = append(t.DB.BookTransactions, &NewTransaction)
 
-	return nil
+	return &NewTransaction, nil
 }
 
 // TO return the BOOk
-func (t *TransactionService) ReturnBook(memberID string, bookID int) error {
+func (t *TransactionService) ReturnBook(memberID string, bookID int) (*models.Transaction, int, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {
-		return err
+		return nil, 0, err
 	}
 
 	book, err := t.BookServiceInstance.BookAvailability(bookID)
 
 	if err != nil {
-		return err
+		return nil, 0, err
 	}
 
 	for _, transaction := range t.DB.BookTransactions {
 		if transaction.Return_date == "" && transaction.Member.Member_id == member.Member_id && transaction.Book.Book_id == book.Book_id {
 			transaction.Return_date = time.Now().Format("02-01-2006")
-			book.Count++
-			return nil
+			transaction.Book.Count++
+			return transaction, Calpenalty(transaction.Borrow_date, transaction.Return_date), err
 		}
 	}
 
-	return nil
+	return nil, 0, errors.New("NO matched entries")
+}
+
+func Calpenalty(Borrow_date, Return_date string) int {
+	const penalty int = 50
+	Bdate, _ := time.Parse("02-01-2006", Borrow_date)
+	Rdate, _ := time.Parse("02-01-2006", Return_date)
+	difference := int(Rdate.Sub(Bdate) / (24 * time.Hour))
+
+	if difference > 10 {
+		return (difference - 10) * penalty
+	}
+	return 0
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"sync"
+	"time"
 
 	"github.com/askrishna98/library_/models"
 )
@@ -28,6 +29,7 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 	defer m.mutex.Unlock()
 
 	newMember.Member_id = m.IdGenerator.GenerateMemberID()
+	newMember.Date = time.Now().Format("02-01-2006")
 	m.DB.Members = append(m.DB.Members, newMember)
 	return nil
 }

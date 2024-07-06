@@ -82,8 +82,7 @@ Create a new member in the system.
 {
   "Name": "ASWINKRISHNA P",
   "Email": "aswin@example.com",
-  "Phone": "9865272720",
-  "Date": "2024-01-01"
+  "Phone": "9865272720"
 }
 ```
 

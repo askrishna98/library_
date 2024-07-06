@@ -128,15 +128,14 @@ func BorrowBook(Tservice *service.TransactionService) gin.HandlerFunc {
 			})
 			return
 		}
-		if err := Tservice.BorrowBook(request.Memberid, request.Bookid); err != nil {
+		if newTrans, err := Tservice.BorrowBook(request.Memberid, request.Bookid); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
 			return
+		} else {
+			c.JSON(http.StatusOK, *newTrans)
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": "borrowed successfully",
-		})
 	}
 }
 
@@ -152,15 +151,24 @@ func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 			})
 			return
 		}
-		if err := Tservice.ReturnBook(request.Memberid, request.Bookid); err != nil {
+		if Trans, penalty, err := Tservice.ReturnBook(request.Memberid, request.Bookid); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
 			return
+		} else {
+
+			c.JSON(http.StatusOK, ResponseWithPenalty{
+				Transaction: *Trans,
+				Penalty:     penalty,
+			})
+			return
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"message": "returned successfully",
-		})
 
 	}
+}
+
+type ResponseWithPenalty struct {
+	models.Transaction
+	Penalty int
 }

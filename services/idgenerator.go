@@ -13,8 +13,8 @@ func InitalizeIDGenerator() *IdGenerator {
 	return &IdGenerator{
 		num:           1,
 		alpha:         "A",
-		bookId:        0,
-		transactionId: 0,
+		bookId:        1,
+		transactionId: 1,
 	}
 }
 
