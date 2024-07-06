@@ -1,6 +1,7 @@
 package service
 
 import (
+	"sync"
 	"time"
 
 	"github.com/askrishna98/library_/models"
@@ -11,6 +12,7 @@ type TransactionService struct {
 	IdGenerator           *IdGenerator
 	MemberServiceInstance *MemberService // uses some methods from Member Service as well as Book service
 	BookServiceInstance   *BookService
+	mutex                 *sync.Mutex
 }
 
 func GetInstanceOfTransactionService(DBInstance *models.MockDB,
@@ -22,11 +24,14 @@ func GetInstanceOfTransactionService(DBInstance *models.MockDB,
 		MemberServiceInstance: MemberServicePointer,
 		BookServiceInstance:   BookServicePointer,
 		IdGenerator:           IdGeneratorInstance,
+		mutex:                 &sync.Mutex{},
 	}
 }
 
 // Creating a new Book transaction
 func (t *TransactionService) BorrowBook(memberID string, bookID int) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
 
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
@@ -37,6 +42,10 @@ func (t *TransactionService) BorrowBook(memberID string, bookID int) error {
 	book, err := t.BookServiceInstance.BookAvailability(bookID)
 
 	if err != nil {
+		return err
+	}
+
+	if err := t.BookServiceInstance.BookCount(book); err != nil {
 		return err
 	}
 
@@ -57,6 +66,9 @@ func (t *TransactionService) BorrowBook(memberID string, bookID int) error {
 
 // TO return the BOOk
 func (t *TransactionService) ReturnBook(memberID string, bookID int) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {

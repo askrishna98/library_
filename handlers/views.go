@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -110,17 +109,10 @@ func Filter(Bservice *service.BookService) gin.HandlerFunc {
 		author := c.Query("author")
 		category := c.Query("category")
 		prefix := c.Query("prefix")
-		var rslice []models.Book
 
-		if author != "" {
-			rslice = Bservice.GetBooksByAuthor(author)
-		} else if category != "" {
-			rslice = Bservice.GetBooksByCategory(category)
-		} else {
-			rslice = Bservice.GetBooksByPrefix(prefix)
-		}
+		filtered_slice := Bservice.Filter(author, category, prefix)
 
-		c.JSON(http.StatusOK, rslice)
+		c.JSON(http.StatusOK, filtered_slice)
 	}
 }
 
@@ -136,7 +128,6 @@ func BorrowBook(Tservice *service.TransactionService) gin.HandlerFunc {
 			})
 			return
 		}
-		fmt.Println(request)
 		if err := Tservice.BorrowBook(request.Memberid, request.Bookid); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),

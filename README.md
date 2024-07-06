@@ -67,3 +67,37 @@ Book Transaction Services:
 
 - BorrowBook(memberID string, bookID int)
 - ReturnBook(memberID string, bookID int)
+
+# APIs
+
+### 1 API Endpoint: POST /api/members
+
+#### Purpose
+
+Create a new member in the system.
+
+#### Request Body (JSON)
+
+{
+"Name": "ASWINKRISHNA P",
+"Email": "aswin@example.com",
+"Phone": "9865272720",
+"Date": "2024-01-01"
+}
+
+#### Response Body (JSON)
+
+{
+"ID": "A001",
+"Name": "ASWINKRISHNA P",
+"Email": "aswin@example.com",
+"Phone": "9865272720",
+"Date": "2024-01-01"
+}
+
+#### Notes
+
+- Endpoint: /api/members
+- Method: POST
+- Content-Type: application/json
+- responds with the newly created member details including a unique ID.

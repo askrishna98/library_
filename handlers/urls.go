@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/askrishna98/library_/loaddata"
 	"github.com/askrishna98/library_/models"
 	service "github.com/askrishna98/library_/services"
 	"github.com/gin-gonic/gin"
@@ -13,9 +14,12 @@ func Handlers(router *gin.Engine) {
 	MockDB := models.GetMockDBInstance()
 	IdGenerator := service.InitalizeIDGenerator()
 
+	//loading test data
+	loaddata.LoadData(MockDB, IdGenerator)
+
 	MemberServices := service.GetInstanceOfMemberService(MockDB, IdGenerator)
-	BookServices := service.GetInstanceOfBookService(MockDB,IdGenerator)
-	TransactionServices := service.GetInstanceOfTransactionService(MockDB,IdGenerator,MemberServices,BookServices)
+	BookServices := service.GetInstanceOfBookService(MockDB, IdGenerator)
+	TransactionServices := service.GetInstanceOfTransactionService(MockDB, IdGenerator, MemberServices, BookServices)
 
 	router.GET("/", Greet)
 
@@ -32,8 +36,8 @@ func Handlers(router *gin.Engine) {
 	Group.GET("/books", Filter(BookServices))
 
 	// transaction routes
-	Group.POST("/borrow",BorrowBook(TransactionServices))
-	Group.POST("/return", ReturnBook(TransactionServices))
+	Group.POST("/borrow", BorrowBook(TransactionServices))
+	Group.PATCH("/return", ReturnBook(TransactionServices))
 }
 
 func StartApp() {
