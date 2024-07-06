@@ -79,10 +79,11 @@ Create a new member in the system.
 #### Request Body (JSON)
 
 {
-"Name": "ASWINKRISHNA P",
-"Email": "aswin@example.com",
-"Phone": "9865272720",
-"Date": "2024-01-01"
+    "ID": "A001",
+    "Name": "ASWINKRISHNA P",
+    "Email": "aswin@example.com",
+    "Phone": "9865272720",
+    "Date": "2024-01-01"
 }
 
 #### Response Body (JSON)
