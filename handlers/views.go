@@ -158,7 +158,8 @@ func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 			return
 		} else {
 
-			c.JSON(http.StatusOK, ResponseWithPenalty{
+			c.JSON(http.StatusOK, ResponseWithPenal
+				ty{
 				Transaction: *Trans,
 				Penalty:     penalty,
 			})
