@@ -44,13 +44,13 @@ func (i *IdGenerator) GenerateMemberID() string {
 func (i *IdGenerator) InitalizeNext() {
 	if i.num == 999 {
 		i.num = 1
-		i.alpha = nextAlpha(i.alpha)
+		i.alpha = NextAlpha(i.alpha)
 	} else {
 		i.num++
 	}
 }
 
-func nextAlpha(s string) string {
+func NextAlpha(s string) string {
 	runes := []rune(s)
 
 	for i := len(runes) - 1; i >= 0; i-- {
