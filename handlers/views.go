@@ -47,8 +47,9 @@ func GetUserByID(Mservice *service.MemberService) gin.HandlerFunc {
 
 func DeleteMemberByID(Mservice *service.MemberService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		id := c.Param("id")
-		err := Mservice.DeleteMember(id)
+		id := c.Query("id")
+		phone := c.Query("phone")
+		err := Mservice.DeleteMember(id, phone)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),

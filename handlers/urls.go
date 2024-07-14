@@ -28,7 +28,7 @@ func Handlers(router *gin.Engine) {
 	// member routes
 	Group.POST("/members", CreateNewMember(MemberServices))
 	Group.GET("/members/:id", GetUserByID(MemberServices))
-	Group.DELETE("/members/:id", DeleteMemberByID(MemberServices))
+	Group.DELETE("/members", DeleteMemberByID(MemberServices))
 
 	// bookRoutes
 	Group.POST("/books", CreateNewBook(BookServices))

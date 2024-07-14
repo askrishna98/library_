@@ -35,13 +35,17 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 }
 
 // to Delete member from Storage
-func (m *MemberService) DeleteMember(memberId string) error {
+func (m *MemberService) DeleteMember(memberId, phoneNumber string) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
 	for i, member := range m.DB.Members {
 		if memberId == member.Member_id {
-			m.DB.Members = append(m.DB.Members[:i], m.DB.Members[i+1:]...)
+			if member.Phone == phoneNumber {
+				m.DB.Members = append(m.DB.Members[:i], m.DB.Members[i+1:]...)
+			} else {
+				return errors.New("phonenumber do not match")
+			}
 			return nil
 		}
 	}
