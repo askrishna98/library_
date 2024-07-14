@@ -95,12 +95,12 @@ func (t *TransactionService) ReturnBook(memberID string, bookID int) (*models.Tr
 
 func Calpenalty(Borrow_date, Return_date string) int {
 	const penalty int = 50
+	const days int = 10
 	Bdate, _ := time.Parse("02-01-2006", Borrow_date)
 	Rdate, _ := time.Parse("02-01-2006", Return_date)
-	difference := int(Rdate.Sub(Bdate) / (24 * time.Hour))
-
+	difference := int(Rdate.Sub(Bdate).Hours() / 24)
 	if difference > 10 {
-		return (difference - 10) * penalty
+		return int(difference/days) * penalty
 	}
 	return 0
 }
