@@ -104,3 +104,24 @@ func Calpenalty(Borrow_date, Return_date string) int {
 	}
 	return 0
 }
+
+// Get list of Books borrowed by a Member
+
+func (t *TransactionService) GetBooksBorrowedByMember(memberID string) ([]models.Book, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	Books := []models.Book{}
+
+	member, err := t.MemberServiceInstance.GetMemberById(memberID)
+	if err != nil {
+		return Books, err
+	}
+
+	for _, transaction := range t.DB.BookTransactions {
+		if transaction.Member == member && transaction.Return_date == "" {
+			Books = append(Books, *transaction.Book)
+		}
+	}
+	return Books, nil
+}

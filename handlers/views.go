@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -141,6 +142,12 @@ func BorrowBook(Tservice *service.TransactionService) gin.HandlerFunc {
 }
 
 func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
+
+	type ResponseWithPenalty struct {
+		models.Transaction
+		Penalty int
+	}
+
 	return func(c *gin.Context) {
 		var request struct {
 			Memberid string `json:"member_id"`
@@ -169,7 +176,26 @@ func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 	}
 }
 
-type ResponseWithPenalty struct {
-	models.Transaction
-	Penalty int
+func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var books []models.Book
+
+		memberID := c.Param("id")
+		books, err := Tservice.GetBooksBorrowedByMember(memberID)
+		fmt.Println(memberID)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		if len(books) == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "Member has not borrowed any books currently.",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, books)
+	}
 }
