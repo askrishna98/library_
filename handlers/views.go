@@ -25,7 +25,13 @@ func CreateNewMember(Mservice *service.MemberService) gin.HandlerFunc {
 			})
 			return
 		}
-		Mservice.CreateMember(&newMember)
+		if err := Mservice.CreateMember(&newMember); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, newMember)
 	}
 }

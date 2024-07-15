@@ -28,6 +28,10 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
+	if newMember.Name == "" {
+		return errors.New("name field should not be empty")
+	}
+
 	newMember.Member_id = m.IdGenerator.GenerateMemberID()
 	newMember.Date = time.Now().Format("02-01-2006")
 	m.DB.Members = append(m.DB.Members, newMember)
