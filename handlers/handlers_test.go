@@ -180,7 +180,7 @@ func TestHandlers(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(http.StatusOK, w.Code)
-		assert.NotNil(w.Body.String())
+		assert.NotEmpty(w.Body.String())
 
 		//  Delete Book which doesnt exists
 		bookID = 37
@@ -214,6 +214,7 @@ func TestHandlers(t *testing.T) {
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(err)
 		assert.Equal(request.Memberid, response.Member.Member_id)
+		assert.Empty(response.Return_date)
 
 		// borrowing book from a Invalid Member
 		request = struct {
@@ -232,4 +233,62 @@ func TestHandlers(t *testing.T) {
 		assert.Equal(http.StatusInternalServerError, w.Code)
 	})
 
+	t.Run("Test_GetListof_Books_By_MemberID", func(t *testing.T) {
+		BookIds := []int{2, 3, 4, 5}
+		MemberID := "A001"
+		// simulating some borrow operation by member A001 (A001 already borrowed a book(id 1))
+		for _, id := range BookIds {
+			request := struct {
+				Memberid string `json:"member_id"`
+				Bookid   int    `json:"book_id"`
+			}{MemberID, id}
+			reqJson, _ := json.Marshal(request)
+			req, _ := http.NewRequest("POST", "/api/borrow", strings.NewReader(string(reqJson)))
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+			assert.Equal(http.StatusOK, w.Code, w.Body.String())
+		}
+
+		req, _ := http.NewRequest("GET", fmt.Sprintf("/api/borrow/%s", MemberID), nil)
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusOK, w.Code)
+		var response []models.Book
+
+		err := json.Unmarshal(w.Body.Bytes(), &response)
+
+		assert.NoError(err)
+		assert.Equal(5, len(response)) // total 5 books borrowed
+	})
+
+	t.Run("Test_Return_book", func(t *testing.T) {
+		request := struct {
+			Memberid string `json:"member_id"`
+			Bookid   int    `json:"book_id"`
+		}{
+			Memberid: "A001",
+			Bookid:   1,
+		}
+		requestJson, _ := json.Marshal(&request)
+		req, _ := http.NewRequest("PATCH", "/api/return", strings.NewReader(string(requestJson)))
+		w := httptest.NewRecorder()
+
+		router.ServeHTTP(w, req)
+
+		assert.Equal(http.StatusOK, w.Code)
+
+		respose := struct {
+			models.Transaction
+			penalty int
+		}{}
+		err := json.Unmarshal(w.Body.Bytes(), &respose)
+
+		assert.NoError(err)
+		assert.Equal(request.Memberid, respose.Member.Member_id)
+		assert.NotEmpty(respose.Return_date)
+		assert.Equal(0, respose.penalty)
+	})
 }
