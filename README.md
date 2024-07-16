@@ -214,6 +214,29 @@ TO borrow Book
 
 #### Response Body (JSON)
 
+```json
+{
+  "Borrow_id": 4,
+  "Member": {
+    "Member_id": "A003",
+    "Name": "Charlie Brown",
+    "Email": "charlie@example.com",
+    "Phone": "345-678-9012",
+    "Date": "15-07-2024"
+  },
+  "Book": {
+    "Book_id": 4,
+    "Title": "The Great Gatsby",
+    "Author": "F. Scott Fitzgerald",
+    "Category": "Classic",
+    "Count": 5
+  },
+  "Borrow_date": "15-07-2024",
+  "Due_date": "25-07-2024",
+  "Return_date": ""
+}
+```
+
 ### 6. API Endpoint: PATCH /api/return
 
 #### Purpose
@@ -230,3 +253,59 @@ To return Book
 ```
 
 #### Response Body (JSON)
+
+```json
+{
+  "Borrow_id": 2,
+  "Member": {
+    "Member_id": "A003",
+    "Name": "Charlie Brown",
+    "Email": "charlie@example.com",
+    "Phone": "345-678-9012",
+    "Date": "15-07-2024"
+  },
+  "Book": {
+    "Book_id": 2,
+    "Title": "1984",
+    "Author": "George Orwell",
+    "Category": "Science Fiction",
+    "Count": 3
+  },
+  "Borrow_date": "15-07-2024",
+  "Due_date": "25-07-2024",
+  "Return_date": "15-07-2024",
+  "Penalty": 0
+}
+```
+
+### 6. API Endpoint: GET /api/borrow/id
+
+#### Purpose
+
+To Get List of Books borrowed By a particular member
+
+#### Request
+
+- Endpoint: `/api/members/:id`
+- Method: GET
+
+#### Response Body (JSON)
+
+```json
+[
+  {
+    "Book_id": 1,
+    "Title": "To Kill a Mockingbird",
+    "Author": "Harper Lee",
+    "Category": "Fiction",
+    "Count": 4
+  },
+  {
+    "Book_id": 3,
+    "Title": "Pride and Prejudice",
+    "Author": "Jane Austen",
+    "Category": "Romance",
+    "Count": 3
+  }
+]
+```
