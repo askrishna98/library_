@@ -282,13 +282,13 @@ func TestHandlers(t *testing.T) {
 
 		respose := struct {
 			models.Transaction
-			penalty int
+			Penalty int
 		}{}
 		err := json.Unmarshal(w.Body.Bytes(), &respose)
 
 		assert.NoError(err)
 		assert.Equal(request.Memberid, respose.Member.Member_id)
 		assert.NotEmpty(respose.Return_date)
-		assert.Equal(0, respose.penalty)
+		assert.Equal(0, respose.Penalty)
 	})
 }
