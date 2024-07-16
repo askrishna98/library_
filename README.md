@@ -70,7 +70,7 @@ Book Transaction Services:
 
 # APIs
 
-### 1. API Endpoint: POST /api/members
+### 1. API Endpoint: POST - /api/members
 
 #### Purpose
 
@@ -100,7 +100,7 @@ Create a new member in the system.
 
 - responds with the newly created member details including a unique ID.
 
-### 2. API Endpoint: GET /api/members/:id
+### 2. API Endpoint: GET - /api/members/:id
 
 #### Purpose
 
@@ -123,7 +123,7 @@ Retrieve details of a specific member by their ID.
 }
 ```
 
-### 3. API Endpoint: POST /api/books
+### 3. API Endpoint: POST - /api/books
 
 #### Purpose
 
@@ -154,7 +154,7 @@ Create a new book in the system.
 
 - responds with the newly created book details including a unique ID (`id`).
 
-### 4. API Endpoint: GET /api/books?category=CATEGORY&author=AUTHORNAME&prefix=ANYPREFIX
+### 4. API Endpoint: GET - /api/books?category=CATEGORY&author=AUTHORNAME&prefix=ANYPREFIX
 
 #### Purpose
 
@@ -197,7 +197,7 @@ Retrieve a list of books based on optional filtering parameters.
 ]
 ```
 
-### 5. API Endpoint: POST /api/borrow
+### 5. API Endpoint: POST - /api/borrow
 
 #### Purpose
 
@@ -237,7 +237,7 @@ TO borrow Book
 }
 ```
 
-### 6. API Endpoint: PATCH /api/return
+### 6. API Endpoint: PATCH - /api/return
 
 #### Purpose
 
@@ -278,7 +278,7 @@ To return Book
 }
 ```
 
-### 6. API Endpoint: GET /api/borrow/id
+### 7. API Endpoint: GET - /api/borrow/id
 
 #### Purpose
 
