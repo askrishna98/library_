@@ -28,8 +28,8 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	if newMember.Name == "" {
-		return errors.New("name field should not be empty")
+	if newMember.Name == "" || newMember.Phone == "" {
+		return errors.New("name or phone field should not be empty")
 	}
 
 	newMember.Member_id = m.IdGenerator.GenerateMemberID()
