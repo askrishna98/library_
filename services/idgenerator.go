@@ -1,12 +1,16 @@
 package service
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 type IdGenerator struct {
 	num           int
 	alpha         string
 	bookId        int
 	transactionId int
+	mutex         *sync.Mutex
 }
 
 func InitalizeIDGenerator() *IdGenerator {
@@ -15,11 +19,15 @@ func InitalizeIDGenerator() *IdGenerator {
 		alpha:         "A",
 		bookId:        1,
 		transactionId: 1,
+		mutex:         &sync.Mutex{},
 	}
 }
 
 // Generate bookId from 0 - ....(int value)
 func (i *IdGenerator) GenerateBookId() int {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+
 	id := i.bookId
 
 	i.bookId++
@@ -28,6 +36,9 @@ func (i *IdGenerator) GenerateBookId() int {
 
 // // Generate unique Id for every transaction from 0 - ....(int value)
 func (i *IdGenerator) GenerateTransactionId() int {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+
 	id := i.transactionId
 
 	i.transactionId++
@@ -35,6 +46,9 @@ func (i *IdGenerator) GenerateTransactionId() int {
 }
 
 func (i *IdGenerator) GenerateMemberID() string {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+
 	ID := i.alpha + fmt.Sprintf("%03d", i.num)
 	i.InitalizeNext()
 	return ID
@@ -42,6 +56,9 @@ func (i *IdGenerator) GenerateMemberID() string {
 }
 
 func (i *IdGenerator) InitalizeNext() {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+
 	if i.num == 999 {
 		i.num = 1
 		i.alpha = NextAlpha(i.alpha)
@@ -51,6 +68,7 @@ func (i *IdGenerator) InitalizeNext() {
 }
 
 func NextAlpha(s string) string {
+
 	runes := []rune(s)
 
 	for i := len(runes) - 1; i >= 0; i-- {
