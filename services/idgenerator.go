@@ -56,8 +56,6 @@ func (i *IdGenerator) GenerateMemberID() string {
 }
 
 func (i *IdGenerator) InitalizeNext() {
-	i.mutex.Lock()
-	defer i.mutex.Unlock()
 
 	if i.num == 999 {
 		i.num = 1
