@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 
@@ -98,25 +99,30 @@ func TestTransactionService(t *testing.T) {
 	})
 	t.Run("BorrowBook_With_Penalty", func(t *testing.T) {
 		// adding some testValues
-		MockDB.Members = []*models.Member{
-			{Member_id: "A001", Name: "member1", Phone: "123456789", Email: "member@example.com"},
-		}
+		MockDB.Members = sync.Map{}
+		MemberService.UniqPhones = sync.Map{}
+		IDgen.alpha = "A"
+		IDgen.num = 1
+		newMember := &models.Member{Member_id: "A001", Name: "member1", Phone: "123456789", Email: "member@example.com"}
+		MemberService.CreateMember(newMember)
+
 		MockDB.Books = []*models.Book{
 			{Book_id: 1, Title: "book1", Author: "author1", Category: "cat1", Count: 1},
 		}
 		MockDB.BookTransactions = []*models.Transaction{}
 
+		m, _ := MockDB.Members.Load(newMember.Member_id)
 		MockDB.BookTransactions = append(MockDB.BookTransactions, &models.Transaction{
 			Borrow_id:   1,
-			Member:      MockDB.Members[0],
+			Member:      m.(*models.Member),
 			Book:        MockDB.Books[0],
 			Borrow_date: "01-07-2024",
 			Due_date:    "10-07-2024",
 		})
-
+		calculatedPenalty := Calpenalty("01-07-2024", time.Now().Format("02-01-2006"))
 		Transaction, penalty, err := TransactionService.ReturnBook("A001", 1)
 		assert.Nil(err)
 		assert.NotNil(Transaction)
-		assert.Equal(50, penalty)
+		assert.Equal(calculatedPenalty, penalty)
 	})
 }

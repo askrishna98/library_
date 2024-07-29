@@ -5,7 +5,7 @@ import (
 	service "github.com/askrishna98/library_/services"
 )
 
-func LoadData(DB *models.MockDB, IdGenerator *service.IdGenerator) {
+func LoadData(DB *models.MockDB, IdGenerator *service.IdGenerator, memberServices *service.MemberService, bookServices *service.BookService) {
 	members := []models.Member{
 		{Name: "Alice Johnson", Email: "alice@example.com", Phone: "123-456-7890", Date: "2024-01-01"},
 		{Name: "Bob Smith", Email: "bob@example.com", Phone: "234-567-8901", Date: "2024-01-02"},
@@ -58,8 +58,8 @@ func LoadData(DB *models.MockDB, IdGenerator *service.IdGenerator) {
 		{Title: "The Name of the Wind", Author: "Patrick Rothfuss", Category: "Fantasy", Count: 5},
 	}
 
-	memberServices := service.GetInstanceOfMemberService(DB, IdGenerator)
-	bookServices := service.GetInstanceOfBookService(DB, IdGenerator)
+	// memberServices := service.GetInstanceOfMemberService(DB, IdGenerator)
+	// bookServices := service.GetInstanceOfBookService(DB, IdGenerator)
 
 	for _, member := range members {
 		memberServices.CreateMember(&member)

@@ -1,10 +1,12 @@
 package models
 
+import "sync"
+
 // MockDB
 type MockDB struct {
-	Members          []*Member
 	Books            []*Book
 	BookTransactions []*Transaction
+	Members          sync.Map
 }
 
 //to get instance

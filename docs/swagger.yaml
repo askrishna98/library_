@@ -1,0 +1,274 @@
+definitions:
+  handlers.BookTransactionRequest:
+    properties:
+      book_id:
+        items:
+          type: integer
+        type: array
+      member_id:
+        type: string
+    type: object
+  handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  handlers.Message:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Book:
+    properties:
+      author:
+        type: string
+      book_id:
+        type: integer
+      category:
+        type: string
+      count:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.Member:
+    properties:
+      date:
+        type: string
+      email:
+        type: string
+      member_id:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  models.Transaction:
+    properties:
+      book:
+        $ref: '#/definitions/models.Book'
+      borrow_date:
+        type: string
+      borrow_id:
+        type: integer
+      due_date:
+        type: string
+      member:
+        $ref: '#/definitions/models.Member'
+      return_date:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /books:
+    get:
+      description: Filters all books by query parameters 'author','category','prefix'.all
+        paramters are not mandatory. details of all books will be given if no paramters
+        are provided.
+      parameters:
+      - description: author
+        in: query
+        name: author
+        type: string
+      - description: category
+        in: query
+        name: category
+        type: string
+      - description: prefix
+        in: query
+        name: prefix
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of Books
+          schema:
+            items:
+              $ref: '#/definitions/models.Book'
+            type: array
+        "400":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Filters books
+      tags:
+      - Books
+    post:
+      consumes:
+      - application/json
+      description: Creates a new Book, details should be passed in JSON.
+      parameters:
+      - description: Book details
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/models.Book'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book details
+          schema:
+            $ref: '#/definitions/models.Book'
+        "400":
+          description: '{"error": "error message"}'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Creates a new Book
+      tags:
+      - Books
+  /books/{id}:
+    delete:
+      description: Deletes a existing book By its ID
+      parameters:
+      - description: BookID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Deleted successfully
+          schema:
+            $ref: '#/definitions/handlers.Message'
+        "500":
+          description: Error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: To Delete Book
+      tags:
+      - Books
+  /borrow:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new Book Transaction, member_id and book_id should be
+        passed in JSON.
+      parameters:
+      - description: Book details
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.BookTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Book-Transaction details
+          schema:
+            $ref: '#/definitions/models.Transaction'
+        "400":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Creates a new Book Transaction
+      tags:
+      - Book-Transactions
+  /borrow/{id}:
+    get:
+      description: Gets list of all books books borrowed by memberID which are not
+        returned yet.
+      parameters:
+      - description: member_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: details of books
+          schema:
+            items:
+              $ref: '#/definitions/models.Book'
+            type: array
+        "400":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Gets list of all books borrowed By member
+      tags:
+      - Book-Transactions
+  /members:
+    delete:
+      description: Deletes the member using MemberID and PhoneNumber passed as query
+        parameters
+      parameters:
+      - description: Member ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Phone Number
+        in: query
+        name: phone
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Deleted successfully
+          schema:
+            $ref: '#/definitions/handlers.Message'
+        "500":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: To delete a Member
+      tags:
+      - members
+    post:
+      consumes:
+      - application/json
+      description: Creates a new member, details should be passed in JSON. name and
+        phone number is necessary
+      parameters:
+      - description: Member details
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/models.Member'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Member details
+          schema:
+            $ref: '#/definitions/models.Member'
+        "400":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Creates a new Member
+      tags:
+      - members
+  /members/{id}:
+    get:
+      description: Get details of a member by their ID
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Member details
+          schema:
+            $ref: '#/definitions/models.Member'
+        "500":
+          description: error message
+          schema:
+            $ref: '#/definitions/handlers.ErrorResponse'
+      summary: Get Member by Member ID
+      tags:
+      - members
+swagger: "2.0"

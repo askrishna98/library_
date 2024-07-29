@@ -29,11 +29,65 @@ func GetInstanceOfTransactionService(DBInstance *models.MockDB,
 	}
 }
 
+type BookTransactionResponse struct {
+	Member struct {
+		MemberID string
+		Name     string
+	}
+	Books []struct {
+		BookID       int
+		Title        string
+		Borrowdate   string
+		DueDate      string
+		ErrorMessage string
+	}
+}
+
 // Creating a new Book transaction
+func (t *TransactionService) BorrowBooks(memberID string, bookIDs []int) (*BookTransactionResponse, error) {
+	var res BookTransactionResponse
+	member, err := t.MemberServiceInstance.GetMemberById(memberID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	res.Member = struct {
+		MemberID string
+		Name     string
+	}{member.Member_id, member.Name}
+
+	for _, id := range bookIDs {
+		trans, err := t.BorrowBook(memberID, id)
+		if err != nil {
+			res.Books = append(res.Books, struct {
+				BookID       int
+				Title        string
+				Borrowdate   string
+				DueDate      string
+				ErrorMessage string
+			}{0, "nil", "nil", "nil", err.Error()})
+		} else {
+			res.Books = append(res.Books, struct {
+				BookID       int
+				Title        string
+				Borrowdate   string
+				DueDate      string
+				ErrorMessage string
+			}{trans.Book.Book_id,
+				trans.Book.Title,
+				trans.Borrow_date,
+				trans.Due_date,
+				"nil"})
+		}
+	}
+	return &res, nil
+}
+
+// a single book
 func (t *TransactionService) BorrowBook(memberID string, bookID int) (*models.Transaction, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
-
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {
