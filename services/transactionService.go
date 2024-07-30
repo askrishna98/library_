@@ -75,6 +75,7 @@ func (t *TransactionService) BorrowBooks(memberID string, bookIDs []int) (*model
 func (t *TransactionService) BorrowBook(memberID string, bookID int) (*models.Transaction, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
+
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {
@@ -214,4 +215,32 @@ func (t *TransactionService) GetBooksBorrowedByMember(memberID string) ([]models
 		}
 	}
 	return Books, nil
+}
+
+// Upcoming return Books
+func (t *TransactionService) UpcomingReturns(date string) []models.UpcomingReturnsResponse {
+	returns := []models.UpcomingReturnsResponse{}
+
+	if date == "" {
+		date = "31-12-9999"
+	}
+	layout := "02-01-2006"
+	dateframe, _ := time.Parse(layout, date)
+	for _, transaction := range t.DB.BookTransactions {
+
+		dueDate, _ := time.Parse(layout, transaction.Due_date)
+
+		if !dueDate.After(dateframe) {
+			entry := models.UpcomingReturnsResponse{
+				MemberID:   transaction.Member.Member_id,
+				MemberName: transaction.Member.Name,
+				BookID:     transaction.Book.Book_id,
+				Title:      transaction.Book.Title,
+				BorrowDate: transaction.Borrow_date,
+				DueDate:    transaction.Due_date,
+			}
+			returns = append(returns, entry)
+		}
+	}
+	return returns
 }

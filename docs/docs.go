@@ -120,9 +120,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deleted successfully",
+                        "description": "success message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.Message"
+                            "$ref": "#/definitions/models.SuccessMessageResponse"
                         }
                     },
                     "500": {
@@ -277,7 +277,7 @@ const docTemplate = `{
                     "200": {
                         "description": "success message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.Message"
+                            "$ref": "#/definitions/models.SuccessMessageResponse"
                         }
                     },
                     "500": {
@@ -322,6 +322,41 @@ const docTemplate = `{
             }
         },
         "/return": {
+            "get": {
+                "description": "Gets list of all upcoming returns of books in timeframe. Expect date (\"DD-MM-YYYY\") as query paramter not mandatory, and lists all books which has due date before the date provided. All upcoming books will belisted if dont provide any date.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Book-Transactions"
+                ],
+                "summary": "Gets list of all Upcoming Returns",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "date",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "details of Upcomingbooks and member",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.UpcomingReturnsResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "description": "Updates the book-transaction, returned_date and penalty is populated in the system, member_id and book_id should be passed in JSON.",
                 "consumes": [
@@ -363,14 +398,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.Message": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
         "models.Book": {
             "type": "object",
             "properties": {
@@ -456,7 +483,7 @@ const docTemplate = `{
         "models.BookTransactionRequest": {
             "type": "object",
             "properties": {
-                "book_id": {
+                "book_ids": {
                     "type": "array",
                     "items": {
                         "type": "integer"
@@ -544,6 +571,37 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "phone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SuccessMessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpcomingReturnsResponse": {
+            "type": "object",
+            "properties": {
+                "bookID": {
+                    "type": "integer"
+                },
+                "borrowDate": {
+                    "type": "string"
+                },
+                "dueDate": {
+                    "type": "string"
+                },
+                "memberID": {
+                    "type": "string"
+                },
+                "memberName": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 }
             }

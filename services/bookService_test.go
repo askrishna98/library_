@@ -23,7 +23,7 @@ func TestBookService(t *testing.T) {
 		err := BookService.CreateBook(testbook)
 		assert.NoError(err)
 		assert.Equal(1, testbook.Book_id, "bookId do not match")
-		assert.Equal(1, len(mockDB.Books), "length of bookslice in DB missmatch")
+		assert.Equal(1, mockDB.Books.Len(), "length of bookslice in DB missmatch")
 	})
 
 	t.Run("BookAvailability", func(t *testing.T) {
@@ -41,12 +41,17 @@ func TestBookService(t *testing.T) {
 	})
 
 	t.Run("FilterBooks", func(t *testing.T) {
-		mockDB.Books = []*models.Book{
+		Books := []*models.Book{
 			{Title: "The Hobbit", Author: "J.R.R. Tolkien", Category: "Fantasy", Count: 8},
 			{Title: "Crime and Punishment", Author: "Fyodor Dostoevsky", Category: "Psychological", Count: 3},
 			{Title: "Brave New World", Author: "Aldous Huxley", Category: "Dystopian", Count: 4},
 			{Title: "The Odyssey", Author: "Homer", Category: "Epic", Count: 6},
 			{Title: "Jane Eyre", Author: "Charlotte Bronte", Category: "Fantasy", Count: 3},
+		}
+		mockDB.Books = models.InitializeNewList()
+
+		for _, book := range Books {
+			mockDB.Books.AddNewItem(book)
 		}
 		tests := []struct {
 			name          string
@@ -70,11 +75,13 @@ func TestBookService(t *testing.T) {
 	})
 
 	t.Run("DeleteBook", func(t *testing.T) {
-		mockDB.Books = []*models.Book{
+		Books := []*models.Book{
 			{Book_id: 1, Title: "Book1", Author: "Author1", Category: "Category1", Count: 8},
 		}
+		mockDB.Books = models.InitializeNewList()
+		mockDB.Books.AddNewItem(Books[0])
 		err := BookService.DeleteBook(1)
 		assert.NoError(err)
-		assert.Equal(len(mockDB.Books), 0)
+		assert.Equal(mockDB.Books.Len(), 0)
 	})
 }

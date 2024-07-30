@@ -283,4 +283,26 @@ func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFun
 	}
 }
 
+// UpcomingReturns godoc
+// @Summary Gets list of all Upcoming Returns
+// @Description Gets list of all upcoming returns of books in timeframe. Expect date ("DD-MM-YYYY") as query paramter not mandatory, and lists all books which has due date before the date provided. All upcoming books will belisted if no date provided.
+// @Tags Book-Transactions
+// @Produce json
+// @Param date query string false "date"
+// @Success 200 {object} []models.UpcomingReturnsResponse "details of Upcomingbooks and member"
+// @Failure 400 {object} models.ErrorResponse "error message"
+// @Router /return [get]
+func UpcomingReturns(Tservice *service.TransactionService) gin.HandlerFunc {
+	return func(c *gin.Context) {
 
+		date := c.Query("date")
+		res := Tservice.UpcomingReturns(date)
+		if len(res) == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"message": "No Books to be returned",
+			})
+			return
+		}
+		c.JSON(http.StatusOK, res)
+	}
+}

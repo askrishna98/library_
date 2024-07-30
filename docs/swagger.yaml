@@ -1,9 +1,4 @@
 definitions:
-  handlers.Message:
-    properties:
-      message:
-        type: string
-    type: object
   models.Book:
     properties:
       author:
@@ -59,7 +54,7 @@ definitions:
     type: object
   models.BookTransactionRequest:
     properties:
-      book_id:
+      book_ids:
         items:
           type: integer
         type: array
@@ -116,6 +111,26 @@ definitions:
       name:
         type: string
       phone:
+        type: string
+    type: object
+  models.SuccessMessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.UpcomingReturnsResponse:
+    properties:
+      bookID:
+        type: integer
+      borrowDate:
+        type: string
+      dueDate:
+        type: string
+      memberID:
+        type: string
+      memberName:
+        type: string
+      title:
         type: string
     type: object
 info:
@@ -191,9 +206,9 @@ paths:
         type: string
       responses:
         "200":
-          description: Deleted successfully
+          description: success message
           schema:
-            $ref: '#/definitions/handlers.Message'
+            $ref: '#/definitions/models.SuccessMessageResponse'
         "500":
           description: Error message
           schema:
@@ -273,7 +288,7 @@ paths:
         "200":
           description: success message
           schema:
-            $ref: '#/definitions/handlers.Message'
+            $ref: '#/definitions/models.SuccessMessageResponse'
         "500":
           description: error message
           schema:
@@ -329,6 +344,32 @@ paths:
       tags:
       - members
   /return:
+    get:
+      description: Gets list of all upcoming returns of books in timeframe. Expect
+        date ("DD-MM-YYYY") as query paramter not mandatory, and lists all books which
+        has due date before the date provided. All upcoming books will belisted if
+        dont provide any date.
+      parameters:
+      - description: date
+        in: query
+        name: date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: details of Upcomingbooks and member
+          schema:
+            items:
+              $ref: '#/definitions/models.UpcomingReturnsResponse'
+            type: array
+        "400":
+          description: error message
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Gets list of all Upcoming Returns
+      tags:
+      - Book-Transactions
     patch:
       consumes:
       - application/json

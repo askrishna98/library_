@@ -106,16 +106,18 @@ func TestTransactionService(t *testing.T) {
 		newMember := &models.Member{Member_id: "A001", Name: "member1", Phone: "123456789", Email: "member@example.com"}
 		MemberService.CreateMember(newMember)
 
-		MockDB.Books = []*models.Book{
+		Books := []*models.Book{
 			{Book_id: 1, Title: "book1", Author: "author1", Category: "cat1", Count: 1},
 		}
+		MockDB.Books = models.InitializeNewList()
+		MockDB.Books.AddNewItem(Books[0])
 		MockDB.BookTransactions = []*models.Transaction{}
 
 		m, _ := MockDB.Members.Load(newMember.Member_id)
 		MockDB.BookTransactions = append(MockDB.BookTransactions, &models.Transaction{
 			Borrow_id:   1,
 			Member:      m.(*models.Member),
-			Book:        MockDB.Books[0],
+			Book:        Books[0],
 			Borrow_date: "01-07-2024",
 			Due_date:    "10-07-2024",
 		})

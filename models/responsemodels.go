@@ -30,6 +30,15 @@ type BookReturnTransactionResponse struct {
 	}
 }
 
+type UpcomingReturnsResponse struct {
+	MemberID   string
+	MemberName string
+	BookID     int
+	Title      string
+	BorrowDate string
+	DueDate    string
+}
+
 // standard error response
 type ErrorResponse struct {
 	Error string `json:"error"`

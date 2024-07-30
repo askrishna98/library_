@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"strings"
-	"sync"
 
 	"github.com/askrishna98/library_/models"
 )
@@ -11,33 +10,29 @@ import (
 type BookService struct {
 	DB          *models.MockDB
 	IdGenerator *IdGenerator
-	mutex       *sync.Mutex
 }
 
 func GetInstanceOfBookService(DBInstance *models.MockDB, IdGeneratorInstance *IdGenerator) *BookService {
 	return &BookService{
 		DB:          DBInstance,
 		IdGenerator: IdGeneratorInstance,
-		mutex:       &sync.Mutex{},
 	}
 }
 
 func (b *BookService) CreateBook(newBook *models.Book) error {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
 
 	newBook.Book_id = b.IdGenerator.GenerateBookId()
-	b.DB.Books = append(b.DB.Books, newBook)
+	b.DB.Books.AddNewItem(newBook)
+
 	return nil
 }
 
 func (b *BookService) DeleteBook(bookID int) error {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
 
-	for i, book := range b.DB.Books {
-		if book.Book_id == bookID {
-			b.DB.Books = append(b.DB.Books[:i], b.DB.Books[i+1:]...)
+	for i, val := range *b.DB.Books.GetItems() {
+		currBook := (*val).(*models.Book)
+		if currBook.Book_id == bookID {
+			b.DB.Books.DeleteItem(i)
 			return nil
 		}
 	}
@@ -46,12 +41,11 @@ func (b *BookService) DeleteBook(bookID int) error {
 
 // to know book is available or present  in library
 func (b *BookService) BookAvailability(bookID int) (*models.Book, error) {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
 
-	for _, book := range b.DB.Books {
-		if book.Book_id == bookID {
-			return book, nil
+	for _, val := range *b.DB.Books.GetItems() {
+		currBook := (*val).(*models.Book)
+		if currBook.Book_id == bookID {
+			return currBook, nil
 		}
 	}
 	return nil, errors.New("book not found")
@@ -69,12 +63,11 @@ func (b *BookService) BookCount(book *models.Book) error {
 // to get list of books by Category,authorname,prefix
 // new filter func
 func (b *BookService) Filter(author, category, prefix string) []models.Book {
-	b.mutex.Lock()
-	defer b.mutex.Unlock()
 
 	filtered_books := []models.Book{}
 
-	for _, book := range b.DB.Books {
+	for _, val := range *b.DB.Books.GetItems() {
+		book := (*val).(*models.Book)
 		if authorMatches(book.Author, author) && categoryMatches(book.Category, category) && prefixMatches(book.Title, prefix) {
 			filtered_books = append(filtered_books, *book)
 		}

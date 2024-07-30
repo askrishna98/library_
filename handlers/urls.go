@@ -47,6 +47,7 @@ func Handlers(router *gin.Engine) {
 	Group.POST("/borrow", BorrowBook(TransactionServices))
 	Group.GET("/borrow/:id", GetListBooksByMemberID(TransactionServices))
 	Group.PATCH("/return", ReturnBook(TransactionServices))
+	Group.GET("/return", UpcomingReturns(TransactionServices))
 }
 
 func StartApp() {
