@@ -29,23 +29,9 @@ func GetInstanceOfTransactionService(DBInstance *models.MockDB,
 	}
 }
 
-type BookTransactionResponse struct {
-	Member struct {
-		MemberID string
-		Name     string
-	}
-	Books []struct {
-		BookID       int
-		Title        string
-		Borrowdate   string
-		DueDate      string
-		ErrorMessage string
-	}
-}
-
-// Creating a new Book transaction
-func (t *TransactionService) BorrowBooks(memberID string, bookIDs []int) (*BookTransactionResponse, error) {
-	var res BookTransactionResponse
+// Performs a List of Book transaction
+func (t *TransactionService) BorrowBooks(memberID string, bookIDs []int) (*models.BookTransactionResponse, error) {
+	res := &models.BookTransactionResponse{}
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 
 	if err != nil {
@@ -74,14 +60,15 @@ func (t *TransactionService) BorrowBooks(memberID string, bookIDs []int) (*BookT
 				Borrowdate   string
 				DueDate      string
 				ErrorMessage string
-			}{trans.Book.Book_id,
-				trans.Book.Title,
-				trans.Borrow_date,
-				trans.Due_date,
-				"nil"})
+			}{
+				BookID:       trans.Book.Book_id,
+				Title:        trans.Book.Title,
+				Borrowdate:   trans.Borrow_date,
+				DueDate:      trans.Due_date,
+				ErrorMessage: "nil"})
 		}
 	}
-	return &res, nil
+	return res, nil
 }
 
 // a single book
@@ -119,7 +106,56 @@ func (t *TransactionService) BorrowBook(memberID string, bookID int) (*models.Tr
 	return &NewTransaction, nil
 }
 
-// TO return the BOOk
+func (t *TransactionService) ReturnBooks(memberID string, bookIDs []int) (*models.BookReturnTransactionResponse, error) {
+	res := &models.BookReturnTransactionResponse{}
+	member, err := t.MemberServiceInstance.GetMemberById(memberID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	res.Member = struct {
+		MemberID string
+		Name     string
+	}{member.Member_id, member.Name}
+
+	for _, bookID := range bookIDs {
+		trans, penalty, err := t.ReturnBook(memberID, bookID)
+		if err != nil {
+			res.Books = append(res.Books, struct {
+				BookID        int
+				Title         string
+				Borrowdate    string
+				DueDate       string
+				Returned_Date string
+				Penalty       int
+				ErrorMessage  string
+			}{0, "nil", "nil", "nil", "nil", 0, err.Error()})
+		} else {
+			res.Books = append(res.Books, struct {
+				BookID        int
+				Title         string
+				Borrowdate    string
+				DueDate       string
+				Returned_Date string
+				Penalty       int
+				ErrorMessage  string
+			}{
+				BookID:        trans.Book.Book_id,
+				Title:         trans.Book.Title,
+				Borrowdate:    trans.Borrow_date,
+				DueDate:       trans.Due_date,
+				Returned_Date: trans.Return_date,
+				Penalty:       penalty,
+				ErrorMessage:  "nil",
+			})
+		}
+	}
+	return res, nil
+
+}
+
+// TO return a single BOOk
 func (t *TransactionService) ReturnBook(memberID string, bookID int) (*models.Transaction, int, error) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()

@@ -58,7 +58,7 @@ const docTemplate = `{
                     "400": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -82,7 +82,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/models.BookRequest"
                         }
                     }
                 ],
@@ -94,12 +94,9 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "{\"error\": \"error message\"}",
+                        "description": "error message",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -131,7 +128,7 @@ const docTemplate = `{
                     "500": {
                         "description": "Error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -152,12 +149,12 @@ const docTemplate = `{
                 "summary": "Creates a new Book Transaction",
                 "parameters": [
                     {
-                        "description": "Book details",
+                        "description": "Request for bookTransaction",
                         "name": "book",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.BookTransactionRequest"
+                            "$ref": "#/definitions/models.BookTransactionRequest"
                         }
                     }
                 ],
@@ -165,13 +162,13 @@ const docTemplate = `{
                     "200": {
                         "description": "Book-Transaction details",
                         "schema": {
-                            "$ref": "#/definitions/models.Transaction"
+                            "$ref": "#/definitions/models.BookTransactionResponse"
                         }
                     },
                     "400": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -209,7 +206,7 @@ const docTemplate = `{
                     "400": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -217,7 +214,7 @@ const docTemplate = `{
         },
         "/members": {
             "post": {
-                "description": "Creates a new member, details should be passed in JSON. name and phone number is necessary",
+                "description": "Creates a new member, details should be passed in JSON. name and phone number is mandatory",
                 "consumes": [
                     "application/json"
                 ],
@@ -235,7 +232,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Member"
+                            "$ref": "#/definitions/models.MemberRequest"
                         }
                     }
                 ],
@@ -249,7 +246,7 @@ const docTemplate = `{
                     "400": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -278,7 +275,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Deleted successfully",
+                        "description": "success message",
                         "schema": {
                             "$ref": "#/definitions/handlers.Message"
                         }
@@ -286,7 +283,7 @@ const docTemplate = `{
                     "500": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -318,7 +315,47 @@ const docTemplate = `{
                     "500": {
                         "description": "error message",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ErrorResponse"
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/return": {
+            "patch": {
+                "description": "Updates the book-transaction, returned_date and penalty is populated in the system, member_id and book_id should be passed in JSON.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Book-Transactions"
+                ],
+                "summary": "Updates the Book-transaction",
+                "parameters": [
+                    {
+                        "description": "Request for  returnbook",
+                        "name": "book",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BookTransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "details of ReturnedBooks",
+                        "schema": {
+                            "$ref": "#/definitions/models.BookReturnTransactionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
                         }
                     }
                 }
@@ -326,28 +363,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.BookTransactionRequest": {
-            "type": "object",
-            "properties": {
-                "book_id": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                },
-                "member_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "type": "string"
-                }
-            }
-        },
         "handlers.Message": {
             "type": "object",
             "properties": {
@@ -376,6 +391,129 @@ const docTemplate = `{
                 }
             }
         },
+        "models.BookRequest": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BookReturnTransactionResponse": {
+            "type": "object",
+            "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "bookID": {
+                                "type": "integer"
+                            },
+                            "borrowdate": {
+                                "type": "string"
+                            },
+                            "dueDate": {
+                                "type": "string"
+                            },
+                            "errorMessage": {
+                                "type": "string"
+                            },
+                            "penalty": {
+                                "type": "integer"
+                            },
+                            "returned_Date": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "member": {
+                    "type": "object",
+                    "properties": {
+                        "memberID": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "models.BookTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "book_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "member_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BookTransactionResponse": {
+            "type": "object",
+            "properties": {
+                "books": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "bookID": {
+                                "type": "integer"
+                            },
+                            "borrowdate": {
+                                "type": "string"
+                            },
+                            "dueDate": {
+                                "type": "string"
+                            },
+                            "errorMessage": {
+                                "type": "string"
+                            },
+                            "title": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "member": {
+                    "type": "object",
+                    "properties": {
+                        "memberID": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Member": {
             "type": "object",
             "properties": {
@@ -396,25 +534,16 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Transaction": {
+        "models.MemberRequest": {
             "type": "object",
             "properties": {
-                "book": {
-                    "$ref": "#/definitions/models.Book"
-                },
-                "borrow_date": {
+                "email": {
                     "type": "string"
                 },
-                "borrow_id": {
-                    "type": "integer"
-                },
-                "due_date": {
+                "name": {
                     "type": "string"
                 },
-                "member": {
-                    "$ref": "#/definitions/models.Member"
-                },
-                "return_date": {
+                "phone": {
                     "type": "string"
                 }
             }

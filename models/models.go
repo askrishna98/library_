@@ -2,7 +2,7 @@ package models
 
 // member struct
 type Member struct {
-	Member_id string
+	Member_id string `json: "member_id"`
 	Name      string
 	Email     string
 	Phone     string

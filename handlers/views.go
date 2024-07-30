@@ -19,13 +19,13 @@ func Greet(c *gin.Context) {
 
 // CreateNewMember godoc
 // @Summary Creates a new Member
-// @Description Creates a new member, details should be passed in JSON. name and phone number is necessary
+// @Description Creates a new member, details should be passed in JSON. name and phone number is mandatory
 // @Tags members
 // @Accept json
 // @Produce json
-// @Param member body models.Member true "Member details"
+// @Param member body models.MemberRequest true "Member details"
 // @Success 200 {object} models.Member "Member details"
-// @Failure 400 {object} ErrorResponse "error message"
+// @Failure 400 {object} models.ErrorResponse "error message"
 // @Router /members [post]
 func CreateNewMember(Mservice *service.MemberService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -55,7 +55,7 @@ func CreateNewMember(Mservice *service.MemberService) gin.HandlerFunc {
 // @Tags members
 // @Param id path string true "Member ID"
 // @Success 200 {object} models.Member "Member details"
-// @Failure 500 {object} ErrorResponse "error message"
+// @Failure 500 {object} models.ErrorResponse "error message"
 // @Router /members/{id} [get]
 func GetUserByID(Mservice *service.MemberService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -78,8 +78,8 @@ func GetUserByID(Mservice *service.MemberService) gin.HandlerFunc {
 // @Tags members
 // @Param id query string true "Member ID"
 // @Param phone query string true "Phone Number"
-// @Success 200 {object} Message "Deleted successfully"
-// @Failure 500 {object} ErrorResponse "error message"
+// @Success 200 {object} models.SuccessMessageResponse "success message"
+// @Failure 500 {object} models.ErrorResponse "error message"
 // @Router /members [delete]
 func DeleteMemberByID(Mservice *service.MemberService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -106,9 +106,9 @@ func DeleteMemberByID(Mservice *service.MemberService) gin.HandlerFunc {
 // @Tags Books
 // @Accept json
 // @Produce json
-// @Param book body models.Book true "Book details"
+// @Param book body models.BookRequest true "Book details"
 // @Success 200 {object} models.Book "Book details"
-// @Failure 400 {object} map[string]string "{"error": "error message"}"
+// @Failure 400 {object} models.ErrorResponse "error message"
 // @Router /books [post]
 func CreateNewBook(Bservice *service.BookService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -135,8 +135,8 @@ func CreateNewBook(Bservice *service.BookService) gin.HandlerFunc {
 // @Description Deletes a existing book By its ID
 // @Tags Books
 // @Param id path string true "BookID"
-// @Success 200 {object} Message "Deleted successfully"
-// @Failure 500 {object} ErrorResponse "Error message"
+// @Success 200 {object} models.SuccessMessageResponse "success message"
+// @Failure 500 {object} models.ErrorResponse "Error message"
 // @Router /books/{id} [delete]
 func DeleteBookByID(Bservice *service.BookService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -168,7 +168,7 @@ func DeleteBookByID(Bservice *service.BookService) gin.HandlerFunc {
 // @Param category query string false "category"
 // @Param prefix query string false "prefix"
 // @Success 200 {object} []models.Book "List of Books"
-// @Failure 400 {object} ErrorResponse "error message"
+// @Failure 400 {object} models.ErrorResponse "error message"
 // @Router /books [get]
 func Filter(Bservice *service.BookService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -190,14 +190,14 @@ func Filter(Bservice *service.BookService) gin.HandlerFunc {
 // @Tags Book-Transactions
 // @Accept json
 // @Produce json
-// @Param book body BookTransactionRequest true "Book details"
-// @Success 200 {object} models.Transaction "Book-Transaction details"
-// @Failure 400 {object} ErrorResponse "error message"
+// @Param book body models.BookTransactionRequest true "Request for bookTransaction"
+// @Success 200 {object} models.BookTransactionResponse "Book-Transaction details"
+// @Failure 400 {object} models.ErrorResponse "error message"
 // @Router /borrow [post]
 func BorrowBook(Tservice *service.TransactionService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		var request BookTransactionRequest
+		var request models.BookTransactionRequest
 
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -216,35 +216,35 @@ func BorrowBook(Tservice *service.TransactionService) gin.HandlerFunc {
 	}
 }
 
+// ReturnBook godoc
+// @Summary Updates the Book-transaction
+// @Description Updates the book-transaction, returned_date and penalty is populated in the system, member_id and book_id should be passed in JSON.
+// @Tags Book-Transactions
+// @Accept json
+// @Produce json
+// @Param book body models.BookTransactionRequest true "Request for  returnbook"
+// @Success 200 {object} models.BookReturnTransactionResponse "details of ReturnedBooks"
+// @Failure 400 {object} models.ErrorResponse "error message"
+// @Router /return [patch]
 func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 
-	type ResponseWithPenalty struct {
-		models.Transaction
-		Penalty int
-	}
-
 	return func(c *gin.Context) {
-		var request struct {
-			Memberid string `json:"member_id"`
-			Bookid   int    `json:"book_id"`
-		}
+		var request models.BookTransactionRequest
+
 		if err := c.ShouldBindJSON(&request); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 			return
 		}
-		if Trans, penalty, err := Tservice.ReturnBook(request.Memberid, request.Bookid); err != nil {
+		if newTrans, err := Tservice.ReturnBooks(request.Memberid, request.Bookids); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
 			return
 		} else {
 
-			c.JSON(http.StatusOK, ResponseWithPenalty{
-				Transaction: *Trans,
-				Penalty:     penalty,
-			})
+			c.JSON(http.StatusOK, newTrans)
 			return
 		}
 
@@ -258,7 +258,7 @@ func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 // @Produce json
 // @Param id path string true "member_id"
 // @Success 200 {object} []models.Book "details of books"
-// @Failure 400 {object} ErrorResponse "error message"
+// @Failure 400 {object} models.ErrorResponse "error message"
 // @Router /borrow/{id} [get]
 func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -283,17 +283,4 @@ func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFun
 	}
 }
 
-type Message struct {
-	Message string `json:"message"`
-}
 
-// ErrorResponse represents a standard error response
-type ErrorResponse struct {
-	Error string `json:"error"`
-}
-
-// transaction request body
-type BookTransactionRequest struct {
-	Memberid string `json:"member_id"`
-	Bookids  []int  `json:"book_id"`
-}
