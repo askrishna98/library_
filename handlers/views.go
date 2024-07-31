@@ -278,7 +278,7 @@ func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFun
 				"message": "Member has not borrowed any books currently.",
 			})
 			return
-		}
+		} 
 		c.JSON(http.StatusOK, books)
 	}
 }
