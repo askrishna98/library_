@@ -100,7 +100,7 @@ func (t *TransactionService) BorrowBook(memberID string, bookID int) (*models.Tr
 		Due_date:    time.Now().AddDate(0, 0, 10).Format("02-01-2006"),
 	}
 	// decrease book count
-	book.Count--
+	book.DecrementCount()
 
 	t.DB.BookTransactions = append(t.DB.BookTransactions, &NewTransaction)
 
@@ -176,7 +176,7 @@ func (t *TransactionService) ReturnBook(memberID string, bookID int) (*models.Tr
 	for _, transaction := range t.DB.BookTransactions {
 		if transaction.Return_date == "" && transaction.Member.Member_id == member.Member_id && transaction.Book.Book_id == book.Book_id {
 			transaction.Return_date = time.Now().Format("02-01-2006")
-			transaction.Book.Count++
+			transaction.Book.IncrementCount()
 			return transaction, Calpenalty(transaction.Borrow_date, transaction.Return_date), err
 		}
 	}
@@ -198,11 +198,9 @@ func Calpenalty(Borrow_date, Return_date string) int {
 
 // Get list of Books borrowed by a Member
 
-func (t *TransactionService) GetBooksBorrowedByMember(memberID string) ([]models.Book, error) {
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
+func (t *TransactionService) GetBooksBorrowedByMember(memberID string) ([]models.BookResponse, error) {
 
-	Books := []models.Book{}
+	Books := []models.BookResponse{}
 
 	member, err := t.MemberServiceInstance.GetMemberById(memberID)
 	if err != nil {
@@ -211,7 +209,13 @@ func (t *TransactionService) GetBooksBorrowedByMember(memberID string) ([]models
 
 	for _, transaction := range t.DB.BookTransactions {
 		if transaction.Member == member && transaction.Return_date == "" {
-			Books = append(Books, *transaction.Book)
+			BookResp := models.BookResponse{
+				Book_id:  transaction.Book.Book_id,
+				Title:    transaction.Book.Title,
+				Category: transaction.Book.Category,
+				Author:   transaction.Book.Author,
+			}
+			Books = append(Books, BookResp)
 		}
 	}
 	return Books, nil

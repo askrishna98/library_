@@ -132,6 +132,51 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Partially update an existing  information of a book",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Books"
+                ],
+                "summary": "To update  book information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "BookID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Member details",
+                        "name": "book",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.BookRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member details",
+                        "schema": {
+                            "$ref": "#/definitions/models.Member"
+                        }
+                    },
+                    "404": {
+                        "description": "error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/borrow": {
@@ -222,7 +267,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "members"
+                    "Members"
                 ],
                 "summary": "Creates a new Member",
                 "parameters": [
@@ -254,7 +299,7 @@ const docTemplate = `{
             "delete": {
                 "description": "Deletes the member using MemberID and PhoneNumber passed as query parameters",
                 "tags": [
-                    "members"
+                    "Members"
                 ],
                 "summary": "To delete a Member",
                 "parameters": [
@@ -293,7 +338,7 @@ const docTemplate = `{
             "get": {
                 "description": "Get details of a member by their ID",
                 "tags": [
-                    "members"
+                    "Members"
                 ],
                 "summary": "Get Member by Member ID",
                 "parameters": [
@@ -319,11 +364,56 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "patch": {
+                "description": "Partially update an existing member's information by their ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Members"
+                ],
+                "summary": "To update a member's information",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Member ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Member details",
+                        "name": "member",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MemberRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Member details",
+                        "schema": {
+                            "$ref": "#/definitions/models.Member"
+                        }
+                    },
+                    "404": {
+                        "description": "error message",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/return": {
             "get": {
-                "description": "Gets list of all upcoming returns of books in timeframe. Expect date (\"DD-MM-YYYY\") as query paramter not mandatory, and lists all books which has due date before the date provided. All upcoming books will belisted if dont provide any date.",
+                "description": "Gets list of all upcoming returns of books in timeframe. Expect date (\"DD-MM-YYYY\") as query paramter not mandatory, and lists all books which has due date before the date provided. All upcoming books will belisted if no date provided.",
                 "produces": [
                     "application/json"
                 ],

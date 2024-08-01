@@ -20,7 +20,7 @@ func Greet(c *gin.Context) {
 // CreateNewMember godoc
 // @Summary Creates a new Member
 // @Description Creates a new member, details should be passed in JSON. name and phone number is mandatory
-// @Tags members
+// @Tags Members
 // @Accept json
 // @Produce json
 // @Param member body models.MemberRequest true "Member details"
@@ -52,7 +52,7 @@ func CreateNewMember(Mservice *service.MemberService) gin.HandlerFunc {
 // GetUserByID godoc
 // @Summary Get Member by Member ID
 // @Description Get details of a member by their ID
-// @Tags members
+// @Tags Members
 // @Param id path string true "Member ID"
 // @Success 200 {object} models.Member "Member details"
 // @Failure 500 {object} models.ErrorResponse "error message"
@@ -72,10 +72,43 @@ func GetUserByID(Mservice *service.MemberService) gin.HandlerFunc {
 	}
 }
 
+// UpdateUserByID godoc
+// @Summary To update a member's information
+// @Description Partially update an existing member's information by their ID
+// @Tags Members
+// @Accept json
+// @Produce json
+// @Param id path string true "Member ID"
+// @Param member body models.MemberRequest true "Member details"
+// @Success 200 {object} models.Member "Member details"
+// @Failure 404 {object} models.ErrorResponse "error message"
+// @Router /members/{id} [patch]
+func UpdateUserByID(Mservice *service.MemberService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		request := models.MemberRequest{}
+
+		memberID := c.Param("id")
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		response, err := Mservice.UpdateMemberInfo(memberID, request)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"err": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, response)
+	}
+}
+
 // DeleteMemberByID godoc
 // @Summary To delete a Member
 // @Description Deletes the member using MemberID and PhoneNumber passed as query parameters
-// @Tags members
+// @Tags Members
 // @Param id query string true "Member ID"
 // @Param phone query string true "Phone Number"
 // @Success 200 {object} models.SuccessMessageResponse "success message"
@@ -125,7 +158,7 @@ func CreateNewBook(Bservice *service.BookService) gin.HandlerFunc {
 				"error": err.Error(),
 			})
 		}
-		c.JSON(http.StatusOK, newBook)
+		c.JSON(http.StatusOK, &newBook)
 
 	}
 }
@@ -156,6 +189,40 @@ func DeleteBookByID(Bservice *service.BookService) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"messasge": "Book Deleted successfully",
 		})
+	}
+}
+
+// UpdateBookInfo godoc
+// @Summary To update  book information
+// @Description Partially update an existing  information of a book
+// @Tags Books
+// @Accept json
+// @Produce json
+// @Param id path string true "BookID"
+// @Param book body models.BookRequest true "Member details"
+// @Success 200 {object} models.Member "Member details"
+// @Failure 404 {object} models.ErrorResponse "error message"
+// @Router /books/{id} [patch]
+func UpdateBookInfo(Bservice *service.BookService) gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		response := models.BookRequest{}
+		BookID, _ := strconv.Atoi(c.Param("id"))
+
+		if err := c.ShouldBindJSON(&response); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		book, err := Bservice.UpdateBookInfo(BookID, response)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, book)
 	}
 }
 
@@ -262,7 +329,7 @@ func ReturnBook(Tservice *service.TransactionService) gin.HandlerFunc {
 // @Router /borrow/{id} [get]
 func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var books []models.Book
+		var books []models.BookResponse
 
 		memberID := c.Param("id")
 		books, err := Tservice.GetBooksBorrowedByMember(memberID)
@@ -278,7 +345,7 @@ func GetListBooksByMemberID(Tservice *service.TransactionService) gin.HandlerFun
 				"message": "Member has not borrowed any books currently.",
 			})
 			return
-		} 
+		}
 		c.JSON(http.StatusOK, books)
 	}
 }

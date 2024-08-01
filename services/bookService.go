@@ -27,6 +27,28 @@ func (b *BookService) CreateBook(newBook *models.Book) error {
 	return nil
 }
 
+// update Booksinfo
+func (b *BookService) UpdateBookInfo(bookID int, updateInfo models.BookRequest) (*models.Book, error) {
+	book, err := b.BookAvailability(bookID)
+
+	if err != nil {
+		return nil, err
+	}
+	if updateInfo.Title != "" {
+		book.Title = updateInfo.Title
+	}
+	if updateInfo.Author != "" {
+		book.Author = updateInfo.Author
+	}
+	if updateInfo.Category != "" {
+		book.Category = updateInfo.Category
+	}
+	if updateInfo.Count != 0 {
+		book.UpdateCount(updateInfo.Count)
+	}
+	return book, err
+}
+
 func (b *BookService) DeleteBook(bookID int) error {
 
 	for i, val := range *b.DB.Books.GetItems() {
@@ -62,14 +84,20 @@ func (b *BookService) BookCount(book *models.Book) error {
 
 // to get list of books by Category,authorname,prefix
 // new filter func
-func (b *BookService) Filter(author, category, prefix string) []models.Book {
+func (b *BookService) Filter(author, category, prefix string) []models.BookResponse {
 
-	filtered_books := []models.Book{}
+	filtered_books := []models.BookResponse{}
 
 	for _, val := range *b.DB.Books.GetItems() {
 		book := (*val).(*models.Book)
 		if authorMatches(book.Author, author) && categoryMatches(book.Category, category) && prefixMatches(book.Title, prefix) {
-			filtered_books = append(filtered_books, *book)
+			currBook := models.BookResponse{
+				Book_id:  book.Book_id,
+				Title:    book.Title,
+				Author:   book.Author,
+				Category: book.Category,
+			}
+			filtered_books = append(filtered_books, currBook)
 		}
 	}
 	return filtered_books

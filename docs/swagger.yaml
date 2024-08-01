@@ -216,6 +216,36 @@ paths:
       summary: To Delete Book
       tags:
       - Books
+    patch:
+      consumes:
+      - application/json
+      description: Partially update an existing  information of a book
+      parameters:
+      - description: BookID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Member details
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/models.BookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Member details
+          schema:
+            $ref: '#/definitions/models.Member'
+        "404":
+          description: error message
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: To update  book information
+      tags:
+      - Books
   /borrow:
     post:
       consumes:
@@ -295,7 +325,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: To delete a Member
       tags:
-      - members
+      - Members
     post:
       consumes:
       - application/json
@@ -321,7 +351,7 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Creates a new Member
       tags:
-      - members
+      - Members
   /members/{id}:
     get:
       description: Get details of a member by their ID
@@ -342,13 +372,43 @@ paths:
             $ref: '#/definitions/models.ErrorResponse'
       summary: Get Member by Member ID
       tags:
-      - members
+      - Members
+    patch:
+      consumes:
+      - application/json
+      description: Partially update an existing member's information by their ID
+      parameters:
+      - description: Member ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Member details
+        in: body
+        name: member
+        required: true
+        schema:
+          $ref: '#/definitions/models.MemberRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Member details
+          schema:
+            $ref: '#/definitions/models.Member'
+        "404":
+          description: error message
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: To update a member's information
+      tags:
+      - Members
   /return:
     get:
       description: Gets list of all upcoming returns of books in timeframe. Expect
         date ("DD-MM-YYYY") as query paramter not mandatory, and lists all books which
         has due date before the date provided. All upcoming books will belisted if
-        dont provide any date.
+        no date provided.
       parameters:
       - description: date
         in: query

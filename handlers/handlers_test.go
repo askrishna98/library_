@@ -96,7 +96,7 @@ func TestHandlers(t *testing.T) {
 			Category: "Cat1",
 			Count:    1,
 		}
-		testBookJson, _ := json.Marshal(testBook)
+		testBookJson, _ := json.Marshal(&testBook)
 
 		req, _ := http.NewRequest("POST", "/api/books", strings.NewReader(string(testBookJson)))
 		w := httptest.NewRecorder()

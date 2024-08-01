@@ -34,7 +34,7 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 
 	phoneNum := newMember.Phone
 	if _, ok := m.UniqPhones.Load(phoneNum); ok {
-		return errors.New("phone number already listed")
+		return errors.New("phone number already exists")
 	}
 	// Details of New member adds to DB
 	m.DB.Members.Store(newMember.Member_id, newMember)
@@ -57,11 +57,11 @@ func (m *MemberService) DeleteMember(memberId, phoneNumber string) error {
 
 	// No match
 	if memberID != memberId {
-		return errors.New("no member assosiated with this mobile Number")
+		return errors.New("MemberID phoneNumber do not match")
 	}
-	value, ok = m.DB.Members.Load(memberID)
-	if !ok {
-		return errors.New("MemberID do not exist")
+	value, err := m.GetMemberById(memberID)
+	if err != nil {
+		return err
 	}
 	member := value.(*models.Member)
 
@@ -69,6 +69,28 @@ func (m *MemberService) DeleteMember(memberId, phoneNumber string) error {
 	m.DB.Members.Delete(member.Member_id)
 
 	return nil
+}
+
+// to update info
+func (m *MemberService) UpdateMemberInfo(memberID string, Updateinfo models.MemberRequest) (models.Member, error) {
+
+	member, err := m.GetMemberById(memberID)
+	if err != nil {
+		return models.Member{}, err
+	}
+
+	if Updateinfo.Name != "" {
+		member.Name = Updateinfo.Name
+	}
+	if Updateinfo.Email != "" {
+		member.Email = Updateinfo.Email
+	}
+	if Updateinfo.Phone != "" {
+		member.Email = Updateinfo.Phone
+	}
+
+	m.DB.Members.Store(member.Member_id, member)
+	return *member, err
 }
 
 // to check whether memberID is Valid

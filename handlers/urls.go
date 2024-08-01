@@ -36,12 +36,14 @@ func Handlers(router *gin.Engine) {
 	// member routes
 	Group.POST("/members", CreateNewMember(MemberServices))
 	Group.GET("/members/:id", GetUserByID(MemberServices))
+	Group.PATCH("/members/:id", UpdateUserByID(MemberServices))
 	Group.DELETE("/members", DeleteMemberByID(MemberServices))
 
 	// bookRoutes
 	Group.POST("/books", CreateNewBook(BookServices))
 	Group.DELETE("/books/:id", DeleteBookByID(BookServices))
 	Group.GET("/books", Filter(BookServices))
+	Group.PATCH("/books/:id",UpdateBookInfo(BookServices))
 
 	// transaction routes
 	Group.POST("/borrow", BorrowBook(TransactionServices))

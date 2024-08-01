@@ -1,5 +1,12 @@
 package models
 
+type BookResponse struct {
+	Book_id  int
+	Title    string
+	Author   string
+	Category string
+}
+
 type BookTransactionResponse struct {
 	Member struct {
 		MemberID string

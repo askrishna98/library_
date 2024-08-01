@@ -19,7 +19,7 @@ func LoadData(DB *models.MockDB, IdGenerator *service.IdGenerator, memberService
 		{Name: "Jane White", Email: "jane@example.com", Phone: "012-345-6789", Date: "2024-01-10"},
 	}
 
-	books := []models.Book{
+	books := []*models.Book{
 		{Title: "To Kill a Mockingbird", Author: "Harper Lee", Category: "Fiction", Count: 5},
 		{Title: "1984", Author: "George Orwell", Category: "Science Fiction", Count: 3},
 		{Title: "Pride and Prejudice", Author: "Jane Austen", Category: "Romance", Count: 4},
@@ -66,6 +66,6 @@ func LoadData(DB *models.MockDB, IdGenerator *service.IdGenerator, memberService
 	}
 
 	for _, book := range books {
-		bookServices.CreateBook(&book)
+		bookServices.CreateBook(book)
 	}
 }
