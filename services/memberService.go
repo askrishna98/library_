@@ -74,23 +74,31 @@ func (m *MemberService) DeleteMember(memberId, phoneNumber string) error {
 // to update info
 func (m *MemberService) UpdateMemberInfo(memberID string, Updateinfo models.MemberRequest) (models.Member, error) {
 
+	newData := models.Member{}
+
 	member, err := m.GetMemberById(memberID)
+
 	if err != nil {
 		return models.Member{}, err
 	}
 
+	newData = *member
+
 	if Updateinfo.Name != "" {
-		member.Name = Updateinfo.Name
+		newData.Name = Updateinfo.Name
 	}
 	if Updateinfo.Email != "" {
-		member.Email = Updateinfo.Email
+		newData.Email = Updateinfo.Email
 	}
 	if Updateinfo.Phone != "" {
-		member.Email = Updateinfo.Phone
+		m.UniqPhones.Delete(member.Phone)
+		newData.Phone = Updateinfo.Phone
+		m.UniqPhones.Store(newData.Phone, newData.Member_id)
+
 	}
 
-	m.DB.Members.Store(member.Member_id, member)
-	return *member, err
+	m.DB.Members.Store(newData.Member_id, &newData)
+	return newData, err
 }
 
 // to check whether memberID is Valid

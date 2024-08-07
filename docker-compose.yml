@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile2
+    container_name: lms_new
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+
