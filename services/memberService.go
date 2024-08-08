@@ -28,14 +28,14 @@ func (m *MemberService) CreateMember(newMember *models.Member) error {
 	if newMember.Name == "" || newMember.Phone == "" {
 		return errors.New("name or phone field should not be empty")
 	}
-
-	newMember.Member_id = m.IdGenerator.GenerateMemberID()
-	newMember.Date = time.Now().Format("02-01-2006")
-
 	phoneNum := newMember.Phone
 	if _, ok := m.UniqPhones.Load(phoneNum); ok {
 		return errors.New("phone number already exists")
 	}
+
+	newMember.Member_id = m.IdGenerator.GenerateMemberID()
+	newMember.Date = time.Now().Format("02-01-2006")
+
 	// Details of New member adds to DB
 	m.DB.Members.Store(newMember.Member_id, newMember)
 	// adds Phone number to uniqNumber
